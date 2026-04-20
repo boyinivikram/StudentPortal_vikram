@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Portal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+}
+
+/* CLOCK */
+.clock{
+  position:absolute;
+  top:20px;
+  left:20px;
+  color:#00fff7;
+}
+
+/* ALERT */
+.alertBox{
+  position:absolute;
+  top:60px;
+  left:20px;
+  background:#ff0055;
+  padding:10px;
+  border-radius:10px;
+  display:none;
+  color:white;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:absolute;
+  left:30px;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.stepItem{
+  margin:10px;
+  padding:8px 15px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+  color:white;
+}
+
+.activeStep{
+  background:#00fff7;
+  color:black;
+}
+
+/* FORM */
+.box{
+  width:380px;
+  padding:25px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(15px);
+  color:white;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  background:#00fff7;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.step{display:none;}
+.active{display:block;}
+</style>
+</head>
+
+<body>
+
+<div class="clock" id="clock"></div>
+<div class="alertBox" id="alertBox"></div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div id="s1" class="stepItem activeStep">Personal</div>
+  <div id="s2" class="stepItem">Academic</div>
+  <div id="s3" class="stepItem">Skills</div>
+</div>
+
+<div class="box">
+
+<!-- STEP 1 -->
+<div id="step1" class="step active">
+<h3>Personal Details</h3>
+
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<input id="phone" placeholder="Phone">
+<input id="dob" type="date">
+
+<button onclick="sendOTP()">Verify Email</button>
+
+<input id="otpInput" placeholder="Enter OTP">
+<button onclick="verifyOTP()">Submit OTP</button>
+
+<button onclick="next1()">Next</button>
+</div>
+
+<!-- STEP 2 -->
+<div id="step2" class="step">
+<h3>Academic Details</h3>
+
+<input id="ug" placeholder="UG Number (10 chars)">
+
+<select id="year">
+<option value="">Select Year</option>
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+<option>4th Year</option>
+</select>
+
+<select id="dept">
+<option value="">Select Department</option>
+<option>CSE</option>
+<option>IT</option>
+<option>ECE</option>
+<option>Mechanical</option>
+</select>
+
+<button onclick="back(2)">Back</button>
+<button onclick="next2()">Next</button>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" class="step">
+<h3>Skills</h3>
+
+<select id="skills" multiple>
+<option>Java</option>
+<option>Python</option>
+<option>HTML</option>
+<option>CSS</option>
+<option>JavaScript</option>
+</select>
+
+<div id="out"></div>
+
+<button onclick="back(3)">Back</button>
+<button onclick="submitForm()">Submit</button>
+</div>
+
+</div>
+
+<script>
+
+// CLOCK
+setInterval(()=>{
+  document.getElementById("clock").innerText = new Date().toLocaleTimeString();
+},1000);
+
+// ALERT
+function showAlert(msg){
+  let box = document.getElementById("alertBox");
+  box.innerText = msg;
+  box.style.display = "block";
+  setTimeout(()=> box.style.display="none",2000);
+}
+
+let data = {};
+let generatedOTP = "";
+let verified = false;
+
+// OTP GENERATE
+function sendOTP(){
+  let email = document.getElementById("email").value;
+
+  if(!email){
+    showAlert("Enter email first");
+    return;
+  }
+
+  generatedOTP = Math.floor(1000 + Math.random()*9000);
+  console.log("OTP:", generatedOTP);
+
+  showAlert("OTP sent! Check console");
+}
+
+// OTP VERIFY
+function verifyOTP(){
+  let userOTP = document.getElementById("otpInput").value;
+
+  if(userOTP == generatedOTP){
+    verified = true;
+    showAlert("Email Verified");
+  } else {
+    showAlert("Wrong OTP");
+  }
+}
+
+// STEP 1
+function next1(){
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let phone = document.getElementById("phone").value;
+  let dob = document.getElementById("dob").value;
+
+  if(!name || !email || !phone || !dob){
+    showAlert("Fill all details");
+    return;
+  }
+
+  if(!verified){
+    showAlert("Verify email first");
+    return;
+  }
+
+  data.name=name;
+  data.email=email;
+  data.phone=phone;
+  data.dob=dob;
+
+  show(1,2);
+}
+
+// STEP 2
+function next2(){
+  let ug = document.getElementById("ug").value;
+  let year = document.getElementById("year").value;
+  let dept = document.getElementById("dept").value;
+
+  if(ug.length!==10 || !year || !dept){
+    showAlert("Fill academic details properly");
+    return;
+  }
+
+  data.ug=ug;
+  data.year=year;
+  data.dept=dept;
+
+  show(2,3);
+}
+
+// NAV
+function show(a,b){
+  document.getElementById("step"+a).classList.remove("active");
+  document.getElementById("step"+b).classList.add("active");
+
+  document.getElementById("s"+a).classList.remove("activeStep");
+  document.getElementById("s"+b).classList.add("activeStep");
+}
+
+function back(step){
+  show(step, step-1);
+}
+
+// FINAL SUBMIT (UPGRADED ENDING)
+function submitForm(){
+
+  let selected = document.getElementById("skills").selectedOptions;
+  let skills = [];
+
+  for(let i=0;i<selected.length;i++){
+    skills.push(selected[i].value);
+  }
+
+  data.skills = skills;
+
+  document.querySelector(".box").innerHTML = `
+    <h2 style="text-align:center;color:#00fff7;">🎉 Registration Successful</h2>
+
+    <div style="margin-top:15px;padding:15px;background:rgba(255,255,255,0.1);border-radius:15px;">
+      <b>Name:</b> ${data.name}<br>
+      <b>Email:</b> ${data.email}<br>
+      <b>Phone:</b> ${data.phone}<br>
+      <b>DOB:</b> ${data.dob}<br>
+      <b>UG:</b> ${data.ug}<br>
+      <b>Year:</b> ${data.year}<br>
+      <b>Dept:</b> ${data.dept}<br>
+      <b>Skills:</b> ${skills.join(", ")}
+    </div>
+
+    <button onclick="location.reload()" style="margin-top:15px;">
+      Register Another Student
+    </button>
+  `;
+}
+
+</script>
+
+</body>
+</html>
